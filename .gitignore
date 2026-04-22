@@ -39,3 +39,27 @@
 
 # debug information files
 *.dwo
+
+# ===== ADD THESE LINES =====
+# Visual Studio specific files
+.vs/
+Project/.vs/
+*.vsidx
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output folders
+Debug/
+Release/
+x64/
+x86/
+Win32/
+bin/
+obj/
+ipch/
+
+# Windows garbage
+Thumbs.db
+Desktop.ini
