@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "ParkingLotSystem\\x64\\Debug\\FileHandler.obj",
+            "outputs": [
+                "ParkingLotSystem\\x64\\Debug\\FileHandler.h_A9DBD83DB0D3B304.ifc.dt.module.json",
+                "ParkingLotSystem\\x64\\Debug\\FileHandler.h_A9DBD83DB0D3B304.ifc.dt.d.json",
+                "ParkingLotSystem\\x64\\Debug\\FileHandler.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "C:\\Users\\shaff\\source\\repos\\ParkingLotSystem\\FileHandler.h",
+                    "source-path": "c:\\users\\shaff\\source\\repos\\parkinglotsystem\\filehandler.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
