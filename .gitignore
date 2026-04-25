@@ -60,6 +60,11 @@ bin/
 obj/
 ipch/
 
+# VS project files - auto-generated, causes merge conflicts
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
 # Windows garbage
 Thumbs.db
 Desktop.ini
