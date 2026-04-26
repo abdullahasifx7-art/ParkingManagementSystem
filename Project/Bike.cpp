@@ -9,5 +9,6 @@ Bike::Bike(string vNo, string owner) : Vehicle(vNo, owner, "Bike") {
 	type = "Bike";
 }
 float Bike::getRate() const {
-	return 1.0f;
+	return 1.0;
+
 }
