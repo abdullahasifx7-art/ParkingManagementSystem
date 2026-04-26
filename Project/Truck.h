@@ -1,6 +1,7 @@
 #ifndef TRUCK_H
 #define TRUCK_H
-#include<iostream>
+#include <iostream>
+#include "Vehicle.h"
 using namespace std;
 class Truck : public Vehicle {
 public:

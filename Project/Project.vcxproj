@@ -128,6 +128,7 @@
     <ClCompile Include="Bill.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="FileHandler.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="ParkingLot.cpp" />
     <ClCompile Include="ParkingSlot.cpp" />
     <ClCompile Include="Truck.cpp" />

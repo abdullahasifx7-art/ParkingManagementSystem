@@ -1,7 +1,7 @@
 #include "Bill.h"
 #include "FileHandler.h"
 #include <iostream>
-
+#include <ctime>
 using namespace std;
 
 // Constructor: stores vehicle, exit time, and rate
@@ -15,31 +15,26 @@ Bill::Bill(Vehicle* v, time_t exit, float currentRate) {
 
 // Calculates how long the vehicle was parked and the total charge
 void Bill::calculate() {
-    // Get difference in seconds between exit and entry
     double seconds = difftime(exitTime, vehicle->getEntryTime());
-
-    // Convert to minutes
-    durationMins = (int)(seconds / 60);
-
-    // Minimum charge is 1 minute
-    if (durationMins < 1) {
-        durationMins = 1;
-    }
-
-    // Multiply minutes by the rate
+    durationMins = static_cast<int>(seconds / 60);
+    if (durationMins < 1) durationMins = 1;
     totalAmount = durationMins * ratePerMinute;
 }
 
 // Prints a formatted receipt to the console
 void Bill::print() const {
-    // Convert time_t to readable HH:MM:SS
     auto timeToStr = [](time_t t) -> string {
-        struct tm* info = localtime(&t);
-        char buf[9];
-        snprintf(buf, sizeof(buf), "%02d:%02d:%02d",
-            info->tm_hour, info->tm_min, info->tm_sec);
-        return string(buf);
-        };
+        struct tm buf;
+#ifdef _WIN32
+        localtime_s(&buf, &t);
+#else
+        struct tm* tmPtr = localtime(&t);
+        if (tmPtr) buf = *tmPtr;
+#endif
+        char out[9];
+        snprintf(out, sizeof(out), "%02d:%02d:%02d", buf.tm_hour, buf.tm_min, buf.tm_sec);
+        return string(out);
+    };
 
     cout << "\n=== PARKING RECEIPT ===" << endl;
     cout << "Entry ID    : " << vehicle->getEntryId() << endl;
@@ -55,22 +50,10 @@ void Bill::print() const {
     cout << "Thank you! Drive safely." << endl;
 }
 
-// Sends this bill to FileHandler to save in history.txt
 void Bill::exportToFile() const {
     FileHandler::saveHistory(const_cast<Bill*>(this));
 }
 
-// Returns duration in minutes
-int Bill::getDuration() const {
-    return durationMins;
-}
-
-// Returns total amount charged
-float Bill::getAmount() const {
-    return totalAmount;
-}
-
-// Returns the entry ID of the vehicle
-string Bill::getEntryId() const {
-    return vehicle->getEntryId();
-}
+int Bill::getDuration() const { return durationMins; }
+float Bill::getAmount() const { return totalAmount; }
+string Bill::getEntryId() const { return vehicle->getEntryId(); }
