@@ -18,6 +18,7 @@ public:
     int          getTotalSlots()      const;
     void         updateRate(string type, float rate);
     float        getRate(string type) const;
+    ParkingSlot* findVehicleByNumber(string vehicleNo) const;
 };
 
 #endif 

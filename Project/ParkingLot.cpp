@@ -122,3 +122,21 @@ float ParkingLot::getRate(string type) const {
 	}
 	return 0.0f;
 }
+
+ParkingSlot* ParkingLot::findVehicleByNumber(string vehicleNo) const {
+	if (vehicleNo.empty()) {
+		cout << "[ParkingLot] Error: Vehicle number cannot be empty.\n";
+		return nullptr;
+	}
+
+	for (int i = 0; i < totalSlots; i++) {
+		if (slots[i] != nullptr) {
+			Vehicle* v = slots[i]->getParkedVehicle();
+			if (v != nullptr && v->getVehicleNo() == vehicleNo) {
+				return slots[i];
+			}
+		}
+	}
+	cout << "[ParkingLot] Vehicle \"" << vehicleNo << "\" not found in any occupied slot.\n";
+	return nullptr;
+}
