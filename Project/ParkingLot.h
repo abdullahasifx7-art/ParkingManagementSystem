@@ -1,7 +1,13 @@
 #ifndef PARKINGLOT_H
 #define PARKINGLOT_H
-#include<iostream>
+
+#include <iostream>
+#include <string>
 using namespace std;
+
+class ParkingSlot; // forward declaration
+class Vehicle;
+
 class ParkingLot {
 private:
     ParkingSlot** slots;
@@ -18,7 +24,7 @@ public:
     int          getTotalSlots()      const;
     void         updateRate(string type, float rate);
     float        getRate(string type) const;
-    ParkingSlot* findVehicleByNumber(string vehicleNo) const;
+    ParkingSlot* findVehicleByNumber(const string& vehicleNo) const;
 };
 
-#endif 
+#endif
