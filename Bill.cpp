@@ -74,3 +74,8 @@ float Bill::getAmount() const {
 string Bill::getEntryId() const {
     return vehicle->getEntryId();
 }
+string Bill::getVehicleNo()   const { return vehicle->getVehicleNo(); }
+string Bill::getOwnerName()   const { return vehicle->getOwnerName(); }
+string Bill::getVehicleType() const { return vehicle->getType(); }
+time_t Bill::getEntryTime()   const { return vehicle->getEntryTime(); }
+time_t Bill::getExitTime()    const { return exitTime; }
