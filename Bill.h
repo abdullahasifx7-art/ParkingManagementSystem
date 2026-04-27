@@ -33,6 +33,11 @@ public:
     int    getDuration() const;
     float  getAmount()   const;
     string getEntryId()  const;
+    string getVehicleNo()   const;
+    string getOwnerName()   const;
+    string getVehicleType() const;
+    time_t getEntryTime()   const;
+    time_t getExitTime()    const;
 };
 
 #endif // BILL_H
