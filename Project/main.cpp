@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <limits>
+#include <cstdlib>
 
 #include "ParkingLot.h"
 #include "ParkingSlot.h"
@@ -49,6 +50,14 @@ int main() {
     FileHandler::loadRates(lot);
     FileHandler::loadSlots(lot);
 
+    // Helper to save state and exit from anywhere
+    auto exitApp = [&](int code = 0) {
+        FileHandler::saveSlots(lot);
+        FileHandler::saveRates(lot);
+        delete lot;
+        std::exit(code);
+        };
+
     bool running = true;
     while (running) {
         cout << "\n=== PARKING MANAGEMENT ===\n";
@@ -62,11 +71,50 @@ int main() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (role == 1) {
-            // Admin role
+            // Admin role - require login first; provide Exit at every step
             bool backToRole = false;
-            while (!backToRole) {
-                cout << "\n--- ADMIN ---\n";
-                cout << "1. Login\n2. View Parked Vehicles\n3. View History\n4. Generate Report (day/week/month)\n5. Update Rate\n6. Export Report\n7. Logout\n8. Back\n9. Add Slot\n10. Remove Slot\nChoose: ";
+            bool adminLoggedIn = false;
+
+            // Login menu (allows Exit/Back)
+            while (!adminLoggedIn && !backToRole) {
+                cout << "\n--- ADMIN LOGIN ---\n";
+                cout << "1. Login\n9. Back\n0. Exit\nChoose: ";
+                int li = 0;
+                if (!(cin >> li)) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    continue;
+                }
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (li == 0) {
+                    exitApp(0);
+                }
+                else if (li == 9) {
+                    backToRole = true;
+                    break;
+                }
+                else if (li == 1) {
+                    string u = readLineNonEmpty("Username: ");
+                    string p = readLineNonEmpty("Password: ");
+                    if (admin.login(u, p)) {
+                        adminLoggedIn = true;
+                        cout << "Login successful!\n";
+                    }
+                    else {
+                        cout << "Invalid credentials. Try again.\n";
+                    }
+                    pause();
+                }
+                else {
+                    cout << "Invalid option.\n";
+                }
+            }
+
+            // Admin features menu (only accessible after login)
+            while (adminLoggedIn && !backToRole) {
+                cout << "\n--- ADMIN FEATURES ---\n";
+                cout << "1. View Parked Vehicles\n2. View History\n3. Generate Report (day/week/month)\n4. Update Rate\n5. Export Report\n6. Add Slot\n7. Remove Slot\n8. Logout\n9. Back\n0. Exit\nChoose: ";
                 int aopt = 0;
                 if (!(cin >> aopt)) {
                     cin.clear();
@@ -75,20 +123,16 @@ int main() {
                 }
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-                switch (aopt) {
-                case 1: {
-                    string u = readLineNonEmpty("Username: ");
-                    string p = readLineNonEmpty("Password: ");
-                    if (admin.login(u, p)) cout << "Login successful.\n";
-                    else cout << "Invalid credentials.\n";
-                    pause();
-                    break;
+                if (aopt == 0) {
+                    exitApp(0);
                 }
-                case 2:
+
+                switch (aopt) {
+                case 1:
                     admin.viewParkedVehicles(lot);
                     pause();
                     break;
-                case 3: {
+                case 2: {
                     string filter;
                     cout << "Enter filter (empty for all): ";
                     getline(cin, filter);
@@ -96,7 +140,7 @@ int main() {
                     pause();
                     break;
                 }
-                case 4: {
+                case 3: {
                     string period;
                     cout << "Enter period (day/week/month): ";
                     getline(cin, period);
@@ -104,7 +148,7 @@ int main() {
                     pause();
                     break;
                 }
-                case 5: {
+                case 4: {
                     string type;
                     cout << "Enter vehicle type (Car/Bike/Truck): ";
                     getline(cin, type);
@@ -122,29 +166,22 @@ int main() {
                     pause();
                     break;
                 }
-                case 6:
+                case 5:
                     admin.exportReport();
                     pause();
                     break;
-                case 7:
-                    admin.logout();
-                    cout << "Logged out.\n";
-                    pause();
-                    break;
-                case 8:
-                    backToRole = true;
-                    break;
-                case 9: { // Add Slot
+                case 6: { // Add Slot
                     string type = readLineNonEmpty("Enter slot type (Compact/Motorcycle/Large/Electric): ");
                     if (lot->addSlot(type)) {
                         cout << "Slot added. New total slots: " << lot->getTotalSlots() << "\n";
-                    } else {
+                    }
+                    else {
                         cout << "Failed to add slot.\n";
                     }
                     pause();
                     break;
                 }
-                case 10: { // Remove Slot
+                case 7: { // Remove Slot
                     cout << "Enter slot id to remove (only last slot can be removed): ";
                     int id;
                     if (!(cin >> id)) {
@@ -156,23 +193,33 @@ int main() {
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     if (lot->removeSlot(id)) {
                         cout << "Slot removed. Total slots: " << lot->getTotalSlots() << "\n";
-                    } else {
+                    }
+                    else {
                         cout << "Failed to remove slot. See messages above for details.\n";
                     }
                     pause();
                     break;
                 }
+                case 8: // Logout
+                    admin.logout();
+                    adminLoggedIn = false;
+                    cout << "Logged out.\n";
+                    pause();
+                    break;
+                case 9:
+                    backToRole = true;
+                    break;
                 default:
                     cout << "Invalid option.\n";
                 }
             }
         }
         else if (role == 2) {
-            // User role
+            // User role - add Exit at every step
             bool backToRole = false;
             while (!backToRole) {
                 cout << "\n--- USER ---\n";
-                cout << "1. Park Vehicle\n2. Exit Vehicle (Bill)\n3. View Slot Grid\n4. Find My Vehicle (by plate)\n5. Back\nChoose: ";
+                cout << "1. Park Vehicle\n2. Exit Vehicle (Bill)\n3. View Slot Grid\n4. Find My Vehicle (by plate)\n5. Back\n0. Exit\nChoose: ";
                 int uopt = 0;
                 if (!(cin >> uopt)) {
                     cin.clear();
@@ -180,6 +227,10 @@ int main() {
                     continue;
                 }
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (uopt == 0) {
+                    exitApp(0);
+                }
 
                 switch (uopt) {
                 case 1: {
@@ -204,7 +255,7 @@ int main() {
                     ParkingSlot* s = lot->assignSlot(v);
                     if (s != nullptr) {
                         cout << "Parked. Entry ID: " << v->getEntryId()
-                             << ", Slot: " << s->getSlotId() << "\n";
+                            << ", Slot: " << s->getSlotId() << "\n";
                     }
                     else {
                         cout << "No suitable slot available. Parking failed.\n";
@@ -252,9 +303,10 @@ int main() {
                     if (found) {
                         Vehicle* v = found->getParkedVehicle();
                         cout << "Found at slot " << found->getSlotId()
-                             << ", Entry ID: " << v->getEntryId()
-                             << ", Entry Time: " << v->getEntryTime() << "\n";
-                    } else {
+                            << ", Entry ID: " << v->getEntryId()
+                            << ", Entry Time: " << v->getEntryTime() << "\n";
+                    }
+                    else {
                         cout << "Vehicle not found.\n";
                     }
                     pause();
