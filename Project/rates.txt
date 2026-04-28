@@ -1,0 +1,3 @@
+Car:2
+Bike:1
+Truck:3
