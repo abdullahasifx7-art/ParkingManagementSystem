@@ -75,4 +75,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="slots.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="rates.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="history.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="admin.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
