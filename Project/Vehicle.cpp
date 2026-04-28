@@ -41,3 +41,9 @@ void Vehicle::generateEntryId() {
 	entryId = type.substr(0, 3) + "-" + vehicleNo;
 	entryTime = time(0);
 }
+void Vehicle::setEntryId(string id) {
+	entryId = id;
+}
+void Vehicle::setEntryTime(time_t t) {
+	entryTime = t;
+}
