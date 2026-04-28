@@ -25,6 +25,9 @@ public:
     void         updateRate(string type, float rate);
     float        getRate(string type) const;
     ParkingSlot* findVehicleByNumber(const string& vehicleNo) const;
+    bool         addSlot(const string& type);   
+
+    bool         removeSlot(int slotId);       
 };
 
 #endif

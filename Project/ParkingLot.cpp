@@ -141,3 +141,60 @@ ParkingSlot* ParkingLot::findVehicleByNumber(const string& vehicleNo) const {
     }
     return nullptr;
 }
+
+// Adds a new slot at the end. New slot is created and available.
+// Returns true on success.
+bool ParkingLot::addSlot(const string& type) {
+    // allocate new array with one extra slot
+    ParkingSlot** newSlots = new ParkingSlot*[totalSlots + 1];
+    for (int i = 0; i < totalSlots; ++i) {
+        newSlots[i] = slots[i];
+    }
+    // new slot index will be totalSlots
+    newSlots[totalSlots] = new ParkingSlot(totalSlots, type);
+    // swap arrays
+    delete[] slots;
+    slots = newSlots;
+    totalSlots += 1;
+    return true;
+}
+
+// Removes a slot by id. To avoid reindexing existing ParkingSlot objects (no slotId setter),
+// only allow removing the last slot. The slot must be available (or null) to be removed.
+bool ParkingLot::removeSlot(int slotId) {
+    if (slotId < 0 || slotId >= totalSlots) {
+        cout << "[ParkingLot] Error: slotId out of range.\n";
+        return false;
+    }
+
+    if (slotId != totalSlots - 1) {
+        cout << "[ParkingLot] Error: only the last slot (id=" << (totalSlots - 1) << ") can be removed to avoid reindexing.\n";
+        return false;
+    }
+
+    if (slots[slotId] != nullptr) {
+        if (!slots[slotId]->isAvailable()) {
+            cout << "[ParkingLot] Error: slot is occupied, cannot remove.\n";
+            return false;
+        }
+        delete slots[slotId];
+        slots[slotId] = nullptr;
+    }
+
+    // shrink array by one
+    if (totalSlots - 1 == 0) {
+        delete[] slots;
+        slots = nullptr;
+        totalSlots = 0;
+        return true;
+    }
+
+    ParkingSlot** newSlots = new ParkingSlot*[totalSlots - 1];
+    for (int i = 0; i < totalSlots - 1; ++i) {
+        newSlots[i] = slots[i];
+    }
+    delete[] slots;
+    slots = newSlots;
+    totalSlots -= 1;
+    return true;
+}
