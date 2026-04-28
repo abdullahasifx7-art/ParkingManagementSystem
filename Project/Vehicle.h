@@ -19,7 +19,9 @@ public:
     string getEntryId() const;
     time_t getEntryTime() const;
     void generateEntryId();
-    virtual ~Vehicle() {}
+    virtual ~Vehicle();
+    void setEntryId(string id);
+    void setEntryTime(time_t t);
 };
 
 #endif // !VEHICLE_H

@@ -1,4 +1,3 @@
-
 // ================================================================
 //  ParkingSlot.cpp
 //  Project  : Parking Lot Management System (C++ / OOP)
@@ -67,10 +66,10 @@ bool ParkingSlot::isAvailable() const {
 //        slots[i]->park(v);
 // ================================================================
 bool ParkingSlot::canAccommodate(const string& vehicleType) const {
-    if (type == "Compact" && vehicleType == "Car")                               return true;
-    if (type == "Large" && (vehicleType == "Car" || vehicleType == "Truck"))   return true;
-    if (type == "Motorcycle" && vehicleType == "Bike")                              return true;
-    if (type == "Electric" && vehicleType == "Car")                               return true;
+    if (type == "Compact" && vehicleType == "Car") return true;
+    if (type == "Large" && (vehicleType == "Car" || vehicleType == "Truck")) return true;
+    if (type == "Motorcycle" && vehicleType == "Bike") return true;
+    if (type == "Electric" && vehicleType == "Car") return true;
     return false;
 }
 
@@ -103,7 +102,7 @@ bool ParkingSlot::park(Vehicle* v) {
     parkedVehicle = v;
     status = "occupied";
     cout << "[ParkingSlot] Slot " << slotId << " (" << type
-        << "): Vehicle " << v->getLicensePlate() << " parked successfully.\n";
+        << "): Vehicle " << v->getVehicleNo() << " parked successfully.\n";
     return true;
 }
 
@@ -122,11 +121,11 @@ Vehicle* ParkingSlot::vacate() {
         cout << "[ParkingSlot] Warning: Slot " << slotId << " is already empty.\n";
         return nullptr;
     }
-    Vehicle* temp = parkedVehicle;   // Save to return for billing
+    Vehicle* temp = parkedVehicle;
     parkedVehicle = nullptr;
     status = "available";
     cout << "[ParkingSlot] Slot " << slotId
-        << ": Vehicle " << temp->getLicensePlate() << " has left. Slot is now available.\n";
+        << ": Vehicle " << temp->getVehicleNo() << " has left. Slot is now available.\n";
     return temp;
 }
 
@@ -147,7 +146,7 @@ bool ParkingSlot::setStatus(const string& s) {
     if (s == "available" || s == "occupied" || s == "maintenance") {
         status = s;
         if (s == "maintenance") {
-            parkedVehicle = nullptr;  // Clear pointer — slot is out of service
+            parkedVehicle = nullptr;
         }
         cout << "[ParkingSlot] Slot " << slotId << " status updated to \"" << s << "\".\n";
         return true;
@@ -161,9 +160,9 @@ bool ParkingSlot::setStatus(const string& s) {
 // ================================================================
 //  Getters
 // ================================================================
-int      ParkingSlot::getSlotId()        const { return slotId; }
-string   ParkingSlot::getType()          const { return type; }
-string   ParkingSlot::getStatus()        const { return status; }
+int ParkingSlot::getSlotId() const { return slotId; }
+string ParkingSlot::getType() const { return type; }
+string ParkingSlot::getStatus() const { return status; }
 Vehicle* ParkingSlot::getParkedVehicle() const { return parkedVehicle; }
 
 
@@ -178,7 +177,7 @@ void ParkingSlot::displayInfo() const {
     cout << "| Type     : " << left << setw(19) << type << "|\n";
     cout << "| Status   : " << left << setw(19) << status << "|\n";
     if (parkedVehicle != nullptr)
-        cout << "| Vehicle  : " << left << setw(19) << parkedVehicle->getLicensePlate() << "|\n";
+        cout << "| Vehicle  : " << left << setw(19) << parkedVehicle->getVehicleNo() << "|\n";
     else
         cout << "| Vehicle  : " << left << setw(19) << "None" << "|\n";
     cout << "+-------------------------------+\n";
