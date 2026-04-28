@@ -66,7 +66,7 @@ int main() {
             bool backToRole = false;
             while (!backToRole) {
                 cout << "\n--- ADMIN ---\n";
-                cout << "1. Login\n2. View Parked Vehicles\n3. View History\n4. Generate Report (day/week/month)\n5. Update Rate\n6. Export Report\n7. Logout\n8. Back\nChoose: ";
+                cout << "1. Login\n2. View Parked Vehicles\n3. View History\n4. Generate Report (day/week/month)\n5. Update Rate\n6. Export Report\n7. Logout\n8. Back\n9. Add Slot\n10. Remove Slot\nChoose: ";
                 int aopt = 0;
                 if (!(cin >> aopt)) {
                     cin.clear();
@@ -134,6 +134,34 @@ int main() {
                 case 8:
                     backToRole = true;
                     break;
+                case 9: { // Add Slot
+                    string type = readLineNonEmpty("Enter slot type (Compact/Motorcycle/Large/Electric): ");
+                    if (lot->addSlot(type)) {
+                        cout << "Slot added. New total slots: " << lot->getTotalSlots() << "\n";
+                    } else {
+                        cout << "Failed to add slot.\n";
+                    }
+                    pause();
+                    break;
+                }
+                case 10: { // Remove Slot
+                    cout << "Enter slot id to remove (only last slot can be removed): ";
+                    int id;
+                    if (!(cin >> id)) {
+                        cin.clear();
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                        cout << "Invalid id\n";
+                        break;
+                    }
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    if (lot->removeSlot(id)) {
+                        cout << "Slot removed. Total slots: " << lot->getTotalSlots() << "\n";
+                    } else {
+                        cout << "Failed to remove slot. See messages above for details.\n";
+                    }
+                    pause();
+                    break;
+                }
                 default:
                     cout << "Invalid option.\n";
                 }
