@@ -198,3 +198,10 @@ bool ParkingLot::removeSlot(int slotId) {
     totalSlots -= 1;
     return true;
 }
+bool ParkingLot::setSlotStatus(int slotId, string status) {
+    ParkingSlot* s = getSlot(slotId);
+    if (!s) return false;
+    if (status != "available" && status != "maintenance") return false;
+    if (status == "maintenance" && s->getStatus() == "occupied") return false;
+    return s->setStatus(status);
+}

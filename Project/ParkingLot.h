@@ -27,7 +27,8 @@ public:
     ParkingSlot* findVehicleByNumber(const string& vehicleNo) const;
     bool         addSlot(const string& type);   
 
-    bool         removeSlot(int slotId);       
+    bool         removeSlot(int slotId);   
+    bool setSlotStatus(int slotId, string status);
 };
 
 #endif
