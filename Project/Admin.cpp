@@ -84,7 +84,7 @@ void Admin::viewHistory(string x) const {
     }
     ifstream file("data/history.txt");
     if (!file.is_open()) {
-        cout << "Error: could not open history.txt" << endl;    
+        cout << "Error: could not open history.txt" << endl;
         return;
     }
     string line;
@@ -94,37 +94,92 @@ void Admin::viewHistory(string x) const {
     }
     file.close();
 }
-
 void Admin::exportReport() const {
     if (!isLoggedIn) {
         cout << "Access denied. Please login first." << endl;
         return;
     }
 
-    time_t now = time(nullptr);
-    struct tm tb;
-#ifdef _WIN32
-    localtime_s(&tb, &now);
-#else
-    struct tm* tmPtr = localtime(&now);
-    if (tmPtr) tb = *tmPtr;
-#endif
-    char filename[50];
-    snprintf(filename, sizeof(filename), "data/report_%04d%02d%02d.txt",
-        tb.tm_year + 1900, tb.tm_mon + 1, tb.tm_mday);
-
-    ofstream file(filename);
+    ofstream file("data/report.txt");
     if (!file.is_open()) {
         cout << "Error: could not create report file" << endl;
         return;
     }
 
-    file << "Parking Lot Report" << endl;
-    file << "Date: " << tb.tm_year + 1900 << "-"
-        << tb.tm_mon + 1 << "-" << tb.tm_mday << endl;
+    // Header
+    file << "========================================" << endl;
+    file << " GRAND VALET PARKING" << endl;
+    file << " REVENUE REPORT" << endl;
+    file << "========================================" << endl;
+    file << "----------------------------------------" << endl;
 
+    ifstream hist("data/history.txt");
+    if (!hist.is_open()) {
+        file << "No history data found." << endl;
+        file.close();
+        return;
+    }
+
+    int totalTransactions = 0;
+    float totalRevenue = 0;
+    float maxBill = 0;
+    float minBill = -1;
+    string line;
+
+    while (getline(hist, line)) {
+        if (line.empty()) continue;
+
+        string cols[8];
+        int idx = 0;
+        string current = "";
+        for (int i = 0; i < line.size(); i++) {
+            if (line[i] == ',' && idx < 8) {
+                cols[idx++] = current;
+                current = "";
+            }
+            else {
+                current += line[i];
+            }
+        }
+        cols[idx] = current;
+
+        if (idx < 7) continue;
+
+        float amount = 0;
+        try { amount = stof(cols[7]); }
+        catch (...) { continue; }
+
+        totalTransactions++;
+        totalRevenue += amount;
+        if (amount > maxBill) maxBill = amount;
+        if (minBill < 0 || amount < minBill) minBill = amount;
+    }
+    hist.close();
+
+    float avgBill = (totalTransactions > 0) ? totalRevenue / totalTransactions : 0;
+
+    file << "\nSUMMARY" << endl;
+    file << " Total Transactions : " << totalTransactions << endl;
+    file << " Total Revenue : Rs " << totalRevenue << endl;
+    file << " Average Bill : Rs " << avgBill << endl;
+    file << " Highest Bill : Rs " << maxBill << endl;
+    file << " Lowest Bill : Rs " << (minBill < 0 ? 0 : minBill) << endl;
+
+    file << "\n----------------------------------------" << endl;
+    file << "FULL TRANSACTION LOG" << endl;
+    file << "----------------------------------------" << endl;
+    file << "EntryID, Plate, Owner, Type, Entry, Exit, Mins, Amount" << endl;
+
+    ifstream hist2("data/history.txt");
+    string line2;
+    while (getline(hist2, line2)) {
+        if (!line2.empty()) file << line2 << endl;
+    }
+    hist2.close();
+
+    file << "\n========================================" << endl;
     file.close();
-    cout << "Report exported to " << filename << endl;
+    cout << "Report exported to data/report.txt" << endl;
 }
 
 void Admin::updateRate(ParkingLot* lot, string type, float val) {
@@ -134,4 +189,27 @@ void Admin::updateRate(ParkingLot* lot, string type, float val) {
     }
     lot->updateRate(type, val);
     FileHandler::saveRates(lot);
+}
+
+void Admin::toggleSlotMaintenance(ParkingLot* lot, int slotId) {
+    if (!isLoggedIn) {
+        cout << "Access denied. Please login first." << endl;
+        return;
+    }
+    ParkingSlot* s = lot->getSlot(slotId);
+    if (!s) {
+        cout << "Invalid slot ID." << endl;
+        return;
+    }
+    if (s->getStatus() == "maintenance") {
+        lot->setSlotStatus(slotId, "available");
+        cout << "Slot " << slotId << " marked as available." << endl;
+    }
+    else if (s->getStatus() == "available") {
+        lot->setSlotStatus(slotId, "maintenance");
+        cout << "Slot " << slotId << " marked as maintenance." << endl;
+    }
+    else {
+        cout << "Cannot change status. Slot is occupied." << endl;
+    }
 }

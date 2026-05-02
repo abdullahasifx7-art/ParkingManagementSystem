@@ -19,6 +19,7 @@ public:
     void viewHistory(string filter) const;
     void exportReport()const;
     void updateRate(ParkingLot* lot, string type, float val);
+    void toggleSlotMaintenance(ParkingLot* lot, int slotId);
 };
 
 
