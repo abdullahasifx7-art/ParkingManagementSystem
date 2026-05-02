@@ -29,6 +29,8 @@ public:
 
     bool         removeSlot(int slotId);   
     bool setSlotStatus(int slotId, string status);
+    ParkingSlot* getSlotByIndex(int index) const;
+    bool setSlotStatusByIndex(int index, string status);
 };
 
 #endif

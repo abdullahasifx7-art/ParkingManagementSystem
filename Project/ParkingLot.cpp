@@ -6,9 +6,15 @@ using namespace std;
 
 ParkingLot::ParkingLot(int total) {
     totalSlots = total;
-    slots = new ParkingSlot*[totalSlots];
+    slots = new ParkingSlot * [totalSlots];
     for (int i = 0; i < totalSlots; i++) {
-        slots[i] = nullptr;
+        // Create actual slot objects
+        if (i % 5 == 0)
+            slots[i] = new ParkingSlot(i, "Large");
+        else if (i % 3 == 0)
+            slots[i] = new ParkingSlot(i, "Motorcycle");
+        else
+            slots[i] = new ParkingSlot(i, "Compact");
     }
     rates[0] = 2.0f; // Car
     rates[1] = 1.0f; // Bike
@@ -33,12 +39,7 @@ ParkingSlot* ParkingLot::assignSlot(Vehicle* v) {
 
     string vehicleType = v->getType();
     for (int i = 0; i < totalSlots; i++) {
-        if (slots[i] == nullptr) {
-            // create a generic slot type that can accept this vehicle;
-            // default to "Compact" for cars, "Motorcycle" for bikes, "Large" for trucks
-            string slotType = (vehicleType == "Car" ? "Compact" : (vehicleType == "Bike" ? "Motorcycle" : "Large"));
-            slots[i] = new ParkingSlot(i, slotType);
-        }
+        // Remove the nullptr check — slots now always exist
         if (slots[i]->isAvailable() && slots[i]->canAccommodate(vehicleType)) {
             if (slots[i]->park(v)) return slots[i];
         }
@@ -62,7 +63,7 @@ bool ParkingLot::freeSlot(string entryId) {
 int ParkingLot::getAvailableCount() const {
     int count = 0;
     for (int i = 0; i < totalSlots; i++) {
-        if (slots[i] == nullptr || slots[i]->isAvailable()) {
+        if (slots[i]->isAvailable()) {
             count++;
         }
     }
@@ -73,25 +74,18 @@ void ParkingLot::displaySlotGrid() const {
     cout << endl;
     cout << " PARKING LOT GRID " << endl;
     for (int i = 0; i < totalSlots; i++) {
-        if (i > 0 && i % 5 == 0) {
-            cout << endl;
-        }
-
-        if (slots[i] == nullptr) {
-            cout << "[ID:" << i << ":EMPTY:N/A] ";
-        }
-        else {
-            cout << "[ID:" << slots[i]->getSlotId()
-                << ":" << slots[i]->getType()
-                << ":" << slots[i]->getStatus() << "] ";
-        }
+        if (i > 0 && i % 5 == 0) cout << endl;
+        cout << "[ID:" << slots[i]->getSlotId()
+            << ":" << slots[i]->getType()
+            << ":" << slots[i]->getStatus() << "] ";
     }
     cout << "\n========================\n" << endl;
 }
 
 ParkingSlot* ParkingLot::getSlot(int id) const {
-    if (id >= 0 && id < totalSlots) {
-        return slots[id];
+    for (int i = 0; i < totalSlots; i++) {
+        if (slots[i] != nullptr && slots[i]->getSlotId() == id)
+            return slots[i];
     }
     return nullptr;
 }
@@ -202,6 +196,18 @@ bool ParkingLot::setSlotStatus(int slotId, string status) {
     ParkingSlot* s = getSlot(slotId);
     if (!s) return false;
     if (status != "available" && status != "maintenance") return false;
+    if (status == "maintenance" && s->getStatus() == "occupied") return false;
+    return s->setStatus(status);
+}
+ParkingSlot* ParkingLot::getSlotByIndex(int index) const {
+    if (index >= 0 && index < totalSlots)
+        return slots[index];
+    return nullptr;
+}
+
+bool ParkingLot::setSlotStatusByIndex(int index, string status) {
+    ParkingSlot* s = getSlotByIndex(index);
+    if (!s) return false;
     if (status == "maintenance" && s->getStatus() == "occupied") return false;
     return s->setStatus(status);
 }
