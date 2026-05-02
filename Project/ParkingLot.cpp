@@ -7,18 +7,19 @@ using namespace std;
 ParkingLot::ParkingLot(int total) {
     totalSlots = total;
     slots = new ParkingSlot * [totalSlots];
+
     for (int i = 0; i < totalSlots; i++) {
-        // Create actual slot objects
-        if (i % 5 == 0)
-            slots[i] = new ParkingSlot(i, "Large");
-        else if (i % 3 == 0)
+        if (i < 20)
+            slots[i] = new ParkingSlot(i, "Compact");
+        else if (i < 30)
             slots[i] = new ParkingSlot(i, "Motorcycle");
         else
-            slots[i] = new ParkingSlot(i, "Compact");
+            slots[i] = new ParkingSlot(i, "Large");
     }
-    rates[0] = 2.0f; // Car
-    rates[1] = 1.0f; // Bike
-    rates[2] = 3.0f; // Truck
+
+    rates[0] = 2.0f;
+    rates[1] = 1.0f;
+    rates[2] = 3.0f;
 }
 
 ParkingLot::~ParkingLot() {
@@ -38,12 +39,38 @@ ParkingSlot* ParkingLot::assignSlot(Vehicle* v) {
     if (v == nullptr) return nullptr;
 
     string vehicleType = v->getType();
-    for (int i = 0; i < totalSlots; i++) {
-        // Remove the nullptr check — slots now always exist
-        if (slots[i]->isAvailable() && slots[i]->canAccommodate(vehicleType)) {
-            if (slots[i]->park(v)) return slots[i];
+
+    if (vehicleType == "Car") {
+        // Priority 1: Compact slots
+        for (int i = 0; i < totalSlots; i++) {
+            if (slots[i]->isAvailable() && slots[i]->getType() == "Compact") {
+                if (slots[i]->park(v)) return slots[i];
+            }
+        }
+        // Priority 2: Large slots (fallback)
+        for (int i = 0; i < totalSlots; i++) {
+            if (slots[i]->isAvailable() && slots[i]->getType() == "Large") {
+                if (slots[i]->park(v)) return slots[i];
+            }
         }
     }
+    else if (vehicleType == "Bike") {
+        // Only Motorcycle slots
+        for (int i = 0; i < totalSlots; i++) {
+            if (slots[i]->isAvailable() && slots[i]->getType() == "Motorcycle") {
+                if (slots[i]->park(v)) return slots[i];
+            }
+        }
+    }
+    else if (vehicleType == "Truck") {
+        // Only Large slots
+        for (int i = 0; i < totalSlots; i++) {
+            if (slots[i]->isAvailable() && slots[i]->getType() == "Large") {
+                if (slots[i]->park(v)) return slots[i];
+            }
+        }
+    }
+
     return nullptr;
 }
 
